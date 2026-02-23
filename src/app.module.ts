@@ -2,7 +2,6 @@ import { RedisModule } from '@nestjs-labs/nestjs-redis';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DevtoolsModule } from '@nestjs/devtools-integration';
-import { ElasticsearchModule } from '@nestjs/elasticsearch';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,6 +9,7 @@ import Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './core/auth.module';
+import { ElasticsearchConfigModule } from './core/elasticsearch/elasticsearch-config.module';
 import { LoggerMiddleware } from './core/middlewares/logger.middleware';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
@@ -52,23 +52,7 @@ import { PropertyModule } from './modules/property/property.module';
       },
     }),
 
-    ElasticsearchModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const node = configService.get<string>('ELASTIC_SEARCH_NODE');
-        const apiKey = configService.get<string>(
-          'ELASTIC_SEARCH_API',
-        ) as string;
-
-        console.log({ node, apiKey }); // 👈 check this
-
-        return {
-          node,
-          auth: { apiKey },
-        };
-      },
-    }),
+    ElasticsearchConfigModule,
 
     TypeOrmModule.forRoot({
       type: 'postgres',

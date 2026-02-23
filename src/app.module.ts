@@ -9,7 +9,6 @@ import Joi from 'joi';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './core/auth.module';
-import { ElasticsearchConfigModule } from './core/elasticsearch/elasticsearch-config.module';
 import { LoggerMiddleware } from './core/middlewares/logger.middleware';
 import { CategoryModule } from './modules/category/category.module';
 import { ProductModule } from './modules/product/product.module';
@@ -47,12 +46,14 @@ import { PropertyModule } from './modules/property/property.module';
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log('hello', configService.get<string>('MONGODB_URI'));
-        return { uri: configService.get<string>('MONGODB_URI') };
+        const uri = configService.get<string>('MONGODB_URI');
+        // Add dbName property to specify the database name
+        return {
+          uri,
+          dbName: 'testdb', // Replace 'testdb' with your actual database name if needed
+        };
       },
     }),
-
-    ElasticsearchConfigModule,
 
     TypeOrmModule.forRoot({
       type: 'postgres',

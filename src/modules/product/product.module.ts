@@ -18,4 +18,4 @@ import { ProductService } from './product.service';
   providers: [ProductService, MyElasticsearchService],
   exports: [],
 })
-export class ProductModule {}
+export class ProductModule {} //yes

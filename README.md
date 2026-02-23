@@ -107,3 +107,15 @@ OFFSET
     ]);
 
 ```
+
+# Many to One
+
+Ownership / Foreign Key Rules
+
+@OneToOne – side with @JoinColumn() owns the foreign key.
+
+@ManyToOne / @OneToMany – ManyToOne side owns the foreign key.
+
+@ManyToMany – side with @JoinTable() owns the join table.
+
+# elastic search

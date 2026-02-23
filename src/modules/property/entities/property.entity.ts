@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { CategoryEnitity } from 'src/modules/category/entities/category.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class PropertyEntity {
@@ -13,4 +20,8 @@ export class PropertyEntity {
 
   @Column('decimal')
   price: number;
+
+  @ManyToMany(() => CategoryEnitity, { lazy: true })
+  @JoinColumn({ name: 'product_categories' })
+  categories: Promise<CategoryEnitity[]>;
 }

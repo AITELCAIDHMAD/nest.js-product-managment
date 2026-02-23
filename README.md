@@ -1,98 +1,109 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+Incoming Request
+Middleware ---> can modify req/res or stop request
+Guards
+Pipes
+Interceptors (before)
+Controller / Route Handler
+Interceptors (after)
+Response sent to client
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+#Class Validator
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Common Decorators
 
-## Description
+- `@IsString()` - Validates that a property is a string
+- `@IsNumber()` - Validates that a property is a number
+- `@IsInt()` - Validates that a property is an integer
+- `@IsEmail()` - Validates that a property is an email
+- `@IsNotEmpty()` - Validates that a property is not empty
+- `@IsOptional()` - Marks a property as optional (skips validation if undefined)
+- `@MinLength(min)` - Validates minimum string length
+- `@MaxLength(max)` - Validates maximum string length
+- `@Min(min)` - Validates minimum number value
+- `@Max(max)` - Validates maximum number value
+- `@IsBoolean()` - Validates that a property is a boolean
+- `@IsArray()` - Validates that a property is an array
+- `@IsDate()` - Validates that a property is a date
+- `@IsEnum(enum)` - Validates that a property is a valid enum value
+- `@IsUrl()` - Validates that a property is a valid URL
+- `@Matches(pattern)` - Validates that a property matches a regex pattern
+- `@ValidateNested()` - Validates nested objects (use with `@Type()` from class-transformer)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## JWT with factory
 
-## Project setup
-
-```bash
-$ npm install
+```
+JwtModule.registerAsync({
+      global: true,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        if (!secret) {
+          throw new Error('JWT_SECRET is not defined in environment variables');
+        }
+        return {
+          secret,
+          signOptions: { expiresIn: '60s' },
+        };
+      },
+    }),
 ```
 
-## Compile and run the project
+# order of sql
 
-```bash
-# development
-$ npm run start
+Logical Execution Order
 
-# watch mode
-$ npm run start:dev
+FROM
 
-# production mode
-$ npm run start:prod
+JOIN (if present)
+
+WHERE
+
+GROUP BY
+
+HAVING
+
+SELECT
+
+DISTINCT (if used)
+
+ORDER BY
+
+LIMIT
+
+OFFSET
+
+# Aggregate data
+
 ```
+ return this.productModel.aggregate([
+      // Lookup stage: join with another collection/table (example: "otherCollection")
+      {
+        $lookup: {
+          from: 'otherCollection', // Replace with the actual collection name you want to join with
+          localField: 'name', // Local field in product documents
+          foreignField: 'name', // Field in the other collection to match
+          as: 'joinedData',
+        },
+      },
 
-## Run tests
+      // Match stage (filter)
+      { $match: {} }, // Empty object matches all documents
 
-```bash
-# unit tests
-$ npm run test
+      // Sort stage
+      { $sort: { name: 1 } }, // 1 = ascending, -1 = descending
 
-# e2e tests
-$ npm run test:e2e
+      // Group stage
+      {
+        $group: {
+          _id: '$name',
+          total: { $sum: 1 }, // Count number of products by name
+          docs: { $push: '$$ROOT' },
+          joined: { $push: '$joinedData' },
+        },
+      },
 
-# test coverage
-$ npm run test:cov
+      // Limit stage
+      { $limit: 10 },
+    ]);
+
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).

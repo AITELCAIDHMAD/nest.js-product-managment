@@ -68,6 +68,7 @@ import { PropertyModule } from './modules/property/property.module';
     RedisModule.forRoot({
       url: 'redis://localhost:6379',
     }),
+
     PropertyModule,
     AuthModule,
     ProductModule,

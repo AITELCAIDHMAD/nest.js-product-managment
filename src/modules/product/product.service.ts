@@ -21,6 +21,8 @@ export class ProductService {
     private elasticsearchService: MyElasticsearchService,
   ) {}
 
+  private hmadArray: string[] = [];
+
   // Create product in both TypeORM and MongoDB
   async create(createProductDto: CreateProductDto) {
     // Create product for TypeORM

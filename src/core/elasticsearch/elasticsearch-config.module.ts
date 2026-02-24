@@ -12,8 +12,6 @@ import { ElasticsearchModule } from '@nestjs/elasticsearch';
         const apiKey = configService.get<string>('ELASTIC_SEARCH_API');
         const cloudId = configService.get<string>('ELASTIC_CLOUD_ID');
 
-        console.log('Elasticsearch Config:', { node, apiKey, cloudId });
-
         if (!node && !cloudId) {
           throw new Error(
             'Either ELASTIC_SEARCH_NODE or ELASTIC_CLOUD_ID must be provided',

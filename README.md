@@ -1,8 +1,8 @@
 Incoming Request
 Middleware ---> can modify req/res or stop request
 Guards
-Pipes
 Interceptors (before)
+Pipes
 Controller / Route Handler
 Interceptors (after)
 Response sent to client
